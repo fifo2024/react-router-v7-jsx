@@ -13,3 +13,5 @@ export const LazyImport: FC<LazyImportProps> = ({ lazy }) => {
         </Suspense>
     );
 };
+
+export default LazyImport;

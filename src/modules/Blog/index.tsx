@@ -1,6 +1,9 @@
 import { lazy, Suspense } from "react";
 import { useRoutes, RouteObject, redirect } from "react-router";
 
+import { Auth } from "@/components";
+import { authLoader } from "@/loaders";
+
 const Page404 = lazy(() => import("@/modules/Page404"));
 const ErrorBoundary = lazy(() => import("@/modules/ErrorBoundary"));
 const BlogIndex = lazy(() => import("@/modules/Blog/BlogIndex"));
@@ -51,20 +54,24 @@ export const routes: RouteObject[] = [
     {
         path: "/:slug",
         loader: async ({ request }) => {
-            console.log("request::/", request);
-            const isLogin = await new Promise((resolve, reject) => {
-                resolve(true);
-                // reject(false);
-            }).catch(() => {
-                return false;
+            console.log("request", request);
+
+            const isAuth = await authLoader({
+                authKey: "fail",
+                authTypes: ["read", "write"],
             });
-            console.log("isLogin", isLogin);
-            if (!isLogin) return redirect("/login");
+
+            console.log("isAuth", isAuth);
+
             return {
-                data: "login",
+                isAuth,
             };
         },
-        element: <BlogDetail />,
+        element: (
+            <Auth authKey="pass" authTypes={["read", "write"]}>
+                <BlogDetail />
+            </Auth>
+        ),
         // errorElement: <PageError />,
         ErrorBoundary,
     },
